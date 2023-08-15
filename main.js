@@ -19,8 +19,8 @@ app.get('/print', async (req, res, next) => {
 
     const page = await browser.newPage();
 
-    await page.goto('https://www.google.com/'
-      // `${req.query.site}` //?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}
+    await page.goto(
+      `${req.query.site}` //?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}
     );
     // await page.waitForSelector(`#${req.query.firstChart}`);
     // await page.waitForSelector(`#${req.query.secondChart}`);
