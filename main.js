@@ -1,21 +1,24 @@
-const express = require('express')
-const puppeteer = require('puppeteer');
-const chromium = require('chrome-aws-lambda');
+const express = require("express");
+const puppeteer = require("puppeteer");
+const chromium = require("chrome-aws-lambda");
 
-const port = process.env.PORT || 5002
+const port = process.env.PORT;
 
-const app = express()
+const app = express();
 
-app.get('/print', async (req, res, next) => {
+app.get("/print", async (req, res, next) => {
   try {
     const browser = await puppeteer.launch({
-      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security', '--disable-extensions', '--no-sandbox'],
+      args: [...chromium.args],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath,
-      headless: 'new',
+      headless: "new",
     });
 
-    console.log(`${req.query.site}?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}`)
+    console.log(
+      `${req.query.site}?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}`
+    );
+    const page = await browser.newPage();
 
     await page.goto(
       `${req.query.site}?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}`
@@ -24,15 +27,14 @@ app.get('/print', async (req, res, next) => {
     // await page.waitForSelector(`#${req.query.secondChart}`);
 
     const pdfFIle = await page.pdf({
-      margin: {left: 120},
+      margin: { left: 120 },
       format: "A4",
       scale: 0.72254,
     });
 
     setTimeout(async () => {
-      
       await browser.close();
-  
+
       res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
         "Content-Disposition",
@@ -45,8 +47,8 @@ app.get('/print', async (req, res, next) => {
     console.error("Error:", error);
     res.status(500).json({ error: "An error occurred" });
   }
-})
+});
 
 app.listen(port, () => {
-  console.log(`server started at ${port}`)
-})
+  console.log(`server started at ${port}`);
+});
