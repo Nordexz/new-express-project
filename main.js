@@ -2,7 +2,7 @@ const express = require('express')
 const puppeteer = require('puppeteer');
 const chromium = require('chrome-aws-lambda');
 
-const port = process.env.PORT
+const port = process.env.PORT || 5002
 
 const app = express()
 
@@ -15,15 +15,13 @@ app.get('/print', async (req, res, next) => {
       headless: 'new',
     });
 
-    console.log(req.query)
-
-    const page = await browser.newPage();
+    console.log(`${req.query.site}?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}`)
 
     await page.goto(
       `${req.query.site}?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}`
     );
-    await page.waitForSelector(`#${req.query.firstChart}`);
-    await page.waitForSelector(`#${req.query.secondChart}`);
+    // await page.waitForSelector(`#${req.query.firstChart}`);
+    // await page.waitForSelector(`#${req.query.secondChart}`);
 
     const pdfFIle = await page.pdf({
       margin: {left: 120},
