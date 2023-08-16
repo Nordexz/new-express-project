@@ -2,14 +2,14 @@ const express = require("express");
 const puppeteer = require("puppeteer");
 const chromium = require("chrome-aws-lambda");
 
-const port = process.env.PORT;
+const port = process.env.PORT || 5002;
 
 const app = express();
 
 app.get("/print", async (req, res, next) => {
   try {
     const browser = await puppeteer.launch({
-      args: [...chromium.args],
+      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security', '--disable-extensions', '--no-sandbox'],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath,
       headless: "new",
@@ -23,16 +23,18 @@ app.get("/print", async (req, res, next) => {
     await page.goto(
       `${req.query.site}?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}`
     );
-    // await page.waitForSelector(`#${req.query.firstChart}`);
-    // await page.waitForSelector(`#${req.query.secondChart}`);
 
-    const pdfFIle = await page.pdf({
-      margin: { left: 120 },
-      format: "A4",
-      scale: 0.72254,
-    });
+    page.setJavaScriptEnabled(true)
+    await page.waitForSelector(`#${req.query.firstChart}`);
+    await page.waitForSelector(`#${req.query.secondChart}`);
 
     setTimeout(async () => {
+      const pdfFIle = await page.pdf({
+        margin: { left: 120 },
+        format: "A4",
+        scale: 0.72254,
+      });
+
       await browser.close();
 
       res.setHeader("Content-Type", "application/pdf");
@@ -42,7 +44,7 @@ app.get("/print", async (req, res, next) => {
       );
       res.status(200);
       res.send(pdfFIle);
-    }, 15000);
+    }, 5000);
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "An error occurred" });
