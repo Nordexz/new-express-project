@@ -1,30 +1,49 @@
 const express = require("express");
 const puppeteer = require("puppeteer");
 const chromium = require("chrome-aws-lambda");
+require('dotenv').config()
 
 const port = process.env.PORT || 5002;
+
+console.log(process.env.TOKEN)
 
 const app = express();
 
 app.get("/print", async (req, res, next) => {
   try {
     const browser = await puppeteer.launch({
-      args: [...chromium.args, '--hide-scrollbars', '--disable-web-security', '--disable-extensions', '--no-sandbox'],
+      args: [
+        ...chromium.args,
+        "--hide-scrollbars",
+        "--disable-web-security",
+        "--disable-extensions",
+        "--no-sandbox",
+      ],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath,
-      headless: "new",
+      headless: false,
     });
 
-    console.log(
-      `${req.query.site}?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}`
-    );
     const page = await browser.newPage();
 
     await page.goto(
       `${req.query.site}?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}`
     );
 
-    page.setJavaScriptEnabled(true)
+    page.setJavaScriptEnabled(true);
+
+    await page.setRequestInterception(true);
+
+    page.on("request", async (request) => {
+      return request.continue({
+        method: "GET",
+        headers: {
+          ...request.headers(),
+          'Authorization': process.env.TOKEN,
+        },
+      });
+    });
+
     await page.waitForSelector(`#${req.query.firstChart}`);
     await page.waitForSelector(`#${req.query.secondChart}`);
 
