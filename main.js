@@ -19,7 +19,7 @@ app.get("/print", async (req, res, next) => {
       ],
       defaultViewport: chromium.defaultViewport,
       executablePath: await chromium.executablePath,
-      headless: false,
+      headless: 'new',
     });
 
     const page = await browser.newPage();
