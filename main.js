@@ -42,8 +42,8 @@ app.get("/print", async (req, res, next) => {
       });
     });
 
-    await page.waitForSelector(`#${req.query.firstChart}`);
-    await page.waitForSelector(`#${req.query.secondChart}`);
+    // await page.waitForSelector(`#${req.query.firstChart}`);
+    // await page.waitForSelector(`#${req.query.secondChart}`);
 
     setTimeout(async () => {
       const pdfFIle = await page.pdf({
