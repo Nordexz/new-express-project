@@ -61,7 +61,7 @@ app.get("/print", async (req, res, next) => {
       );
       res.status(200);
       res.send(pdfFIle);
-    }, 5000);
+    }, 15000);
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ error: "An error occurred" });
