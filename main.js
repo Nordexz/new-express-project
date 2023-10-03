@@ -25,7 +25,7 @@ app.get("/print", async (req, res, next) => {
     const page = await browser.newPage();
 
     await page.goto(
-      `${req.query.site}?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}&patientName=${req.query.patientName}`
+      `${req.query.site}?timestamp=${req.query.timestamp}&patientId=${req.query.patientId}&doctorName=${req.query.doctorName}&firstChart=${req.query.firstChart}&secondChart=${req.query.secondChart}&patientName=${req.query.patientName}&timezoneOffset=${req.query.timezoneOffset}`
     );
 
     page.setJavaScriptEnabled(true);
